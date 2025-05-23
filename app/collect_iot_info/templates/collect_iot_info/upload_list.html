@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>写真アップロード</title>
+  <script src="{% static 'upload.js' %}"></script>
+</head>
+<body>
+  <h1>写真アップロード</h1>
+  <input type="file" id="fileInput">
+  <button onclick="doUpload()">アップロード</button>
+  <div id="result"></div>
+
+  <script>
+    function doUpload() {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) {
+        alert('ファイルを選択してください');
+        return;
+      }
+      uploadToS3(file)
+        .then(() => {
+          document.getElementById('result').innerText = 'アップロードに成功しました';
+        })
+        .catch(err => {
+          document.getElementById('result').innerText = 'アップロードに失敗しました: ' + err;
+        });
+    }
+  </script>
+</body>
+</html>

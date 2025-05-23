@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+.Python
+build/
+dist/
+
+# Environments
+.env
+venv/
+env/
+
+# Django specific
+*.log
+*.pot
+*.mo
+*.db
+*.sqlite3 # ローカル開発用DBファイル
+media/    # ユーザーアップロードメディアファイル (本番はS3など)
+
+# IDE specific
+.idea/
+.vscode/
+.DS_Store # macOS
+Thumbs.db # Windows

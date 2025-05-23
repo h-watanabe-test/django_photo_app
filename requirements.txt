@@ -1,0 +1,12 @@
+# 必要なライブラリを記載
+## Django
+Django>=4.2
+gunicorn
+
+## AWS S3
+boto3
+django-storages
+
+## AWS Aurora PostgreSQL
+psycopg2-binary
+
