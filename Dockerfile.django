@@ -1,0 +1,38 @@
+# ベースイメージとしてPythonと軽量なAlpine Linuxを使用
+FROM python:3.11-alpine
+
+# システムパッケージのインストールとクリーンアップ
+# Djangoアプリが動作するために必要な依存関係（例: psycopg2-binaryがPostgreSQLとやり取りするため）
+# この辺はrequirements.txtの内容によって調整
+RUN apk add --no-cache postgresql-client build-base libffi-dev openssl-dev
+
+# ワークディレクトリの設定
+WORKDIR /app
+
+# Pythonの依存関係ファイルを先にコピーしてキャッシュを活用
+COPY app/requirements.txt /app/
+
+# Pythonの依存関係をインストール
+RUN pip install --no-cache-dir -r requirements.txt
+
+# アプリケーションのソースコードをコピー
+# .dockerignoreを使って不要なファイルをコピーしないようにすると良い
+COPY app/ . /app/
+
+# Djangoのマイグレーションと静的ファイルの収集
+# 本番環境では静的ファイルはS3などのストレージに保存するのが一般的
+# ここでは例としてコンテナ内に収集
+# これらのコマンドはビルド時ではなく、ECSのタスク起動時に実行されることが多い
+# (例: Fargateタスクのライフサイクルイベントでrun_migrations.shを実行するなど)
+# コピーのみにしておき、buildspec.ymlやタスク定義のentrypointで実行することも可能
+# RUN python manage.py collectstatic --noinput
+# RUN python manage.py migrate
+
+# コンテナがリッスンするポート
+# Djangoのデフォルトは8000 (runserver) またはGunicorn/uWSGIなどが使うポート
+# ここではGunicorn/uWSGIを使うことを想定
+EXPOSE 8000
+
+# GunicornなどのWSGIサーバーを起動するコマンド
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"] # 開発用
+CMD ["gunicorn", "django_project.wsgi:application", "--bind", "0.0.0.0:8000"]

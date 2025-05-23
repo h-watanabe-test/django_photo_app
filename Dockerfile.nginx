@@ -1,0 +1,16 @@
+# ベースイメージとして公式のNginxを使用
+FROM nginx:alpine
+
+# Nginxの設定ファイルをコンテナ内にコピー
+# ローカルの `nginx/default.conf` をコンテナの `/etc/nginx/conf.d/default.conf` にコピー
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# 静的ファイルの格納場所を作成 (任意、もしNginxが静的ファイルを直接提供する場合)
+# COPY app/staticfiles /app/static # ビルド時に静的ファイルをコピーする場合
+
+# コンテナがリッスンするポート
+EXPOSE 80
+
+# Nginxをフォアグラウンドで起動
+# これがDockerのベストプラクティス
+CMD ["nginx", "-g", "daemon off;"]

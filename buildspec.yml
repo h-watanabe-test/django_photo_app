@@ -1,0 +1,43 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      # AWS CLIとDockerが使用可能であることを確認
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      # ECRリポジトリのURIを変数に設定（CodeBuildの環境変数で設定することも可能）
+      - REPOSITORY_URI_DJANGO=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/django-app
+      - REPOSITORY_URI_NGINX=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/nginx-proxy
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7) # Gitから取得するハッシュ
+      - IMAGE_TAG=${COMMIT_HASH:-latest}
+
+  build:
+    commands:
+      - echo Build started on `date`
+      # DjangoアプリケーションのDockerイメージをビルド
+      - echo Building the Django Docker image...
+      - docker build -t $REPOSITORY_URI_DJANGO:latest -f Dockerfile.django .
+      - docker tag $REPOSITORY_URI_DJANGO:latest $REPOSITORY_URI_DJANGO:$IMAGE_TAG
+
+      # NginxプロキシのDockerイメージをビルド
+      - echo Building the Nginx Docker image...
+      - docker build -t $REPOSITORY_URI_NGINX:latest -f nginx/Dockerfile.nginx nginx/
+      - docker tag $REPOSITORY_URI_NGINX:latest $REPOSITORY_URI_NGINX:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images to Amazon ECR...
+      - docker push $REPOSITORY_URI_DJANGO:latest
+      - docker push $REPOSITORY_URI_DJANGO:$IMAGE_TAG
+      - docker push $REPOSITORY_URI_NGINX:latest
+      - docker push $REPOSITORY_URI_NGINX:$IMAGE_TAG
+      - echo Writing image definitions file...
+      # ECSタスク定義で参照するために、イメージURIを格納したファイルを生成
+      # このファイルはCodePipelineの次のステージ（例: ECSデプロイ）で利用される
+      - printf '[{"name":"django-container","imageUri":"%s"},{"name":"nginx-container","imageUri":"%s"}]' $REPOSITORY_URI_DJANGO:$IMAGE_TAG $REPOSITORY_URI_NGINX:$IMAGE_TAG > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
