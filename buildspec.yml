@@ -7,7 +7,7 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       # ECRリポジトリのURIを変数に設定（CodeBuildの環境変数で設定することも可能）
-      - REPOSITORY_URI_DJANGO=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/django-app
+      - REPOSITORY_URI_DJANGO=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/django_photo_app
       - REPOSITORY_URI_NGINX=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/nginx-proxy
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7) # Gitから取得するハッシュ
       - IMAGE_TAG=${COMMIT_HASH:-latest}
