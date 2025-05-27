@@ -22,7 +22,7 @@ phases:
 
       # NginxプロキシのDockerイメージをビルド
       - echo Building the Nginx Docker image...
-      - docker build -t $REPOSITORY_URI_NGINX:latest -f nginx/Dockerfile.nginx nginx/
+      - docker build -t $REPOSITORY_URI_NGINX:latest -f Dockerfile.nginx nginx/
       - docker tag $REPOSITORY_URI_NGINX:latest $REPOSITORY_URI_NGINX:$IMAGE_TAG
 
   post_build:
