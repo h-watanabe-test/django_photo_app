@@ -39,7 +39,7 @@ phases:
       - echo Writing image definitions file...
       # ECSタスク定義で参照するために、イメージURIを格納したファイルを生成
       # このファイルはCodePipelineの次のステージ（例: ECSデプロイ）で利用される
-      - printf '[{"name":"django-container","imageUri":"%s"},{"name":"nginx-container","imageUri":"%s"}]' $REPOSITORY_URI_DJANGO:$IMAGE_TAG $REPOSITORY_URI_NGINX:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"django_photo_app","imageUri":"%s"},{"name":"nginx-proxy","imageUri":"%s"}]' $REPOSITORY_URI_DJANGO:$IMAGE_TAG $REPOSITORY_URI_NGINX:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
   files:
