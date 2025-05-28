@@ -27,11 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost','*']
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-#STATIC_URL = 'static/'
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -133,24 +128,31 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-### S3・静的/メディアファイル設定（django-storages利用）
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'ap-northeast-1')  # 東京リージョン
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static' # Nginxがアクセスするパス
+
+### S3・静的/メディアファイル設定（django-storages利用）
+#AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+#AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+#AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+#AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'ap-northeast-1')  # 東京リージョン
+#AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+#STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 
 
 ### メディアファイル用ストレージ（例: collect_iot_info/storages_backends.pyを作成）
-DEFAULT_FILE_STORAGE = 'collect_iot_info.backends.s3boto3.S3Boto3Storage'
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+#DEFAULT_FILE_STORAGE = 'collect_iot_info.backends.s3boto3.S3Boto3Storage'
+#MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 
 #MEDIA_ROOT
 #ユーザーがアップロードしたファイルの保存先を指定
-#MEDIA_URL = '/media/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media' # Nginxがアクセスするパス
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 ### ログイン認証用

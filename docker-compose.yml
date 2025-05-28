@@ -1,7 +1,11 @@
 services:
-  django:
-    container_name      : django
-    build: .
+  django_photo_app:
+    container_name      : django_photo_app
+    build: 
+      context: .
+      dockerfile: Dockerfile.django
+    ports:
+      - "8000:8000"
     volumes:
       - ./app:/app
     env_file:
@@ -10,8 +14,11 @@ services:
       db:
         condition: service_healthy
 
-  nginx:
-    container_name      : nginx
+  nginx-proxy:
+    container_name      : nginx-proxy
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
     image: nginx:alpine
     ports:
       - "80:80"
@@ -19,7 +26,7 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - static_volume:/app/static
     depends_on:
-      - django
+      - django_photo_app
 
   db:
     image: postgres:17.5
