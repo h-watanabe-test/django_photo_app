@@ -1,6 +1,20 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      docker: 19
+    commands:
+      # Docker Hub 認証情報のための環境変数を設定
+      # Secrets Manager から認証情報を取得
+      # ${DOCKER_HUB_CREDENTIALS} は Secrets Manager の ARN を参照します
+      - |
+        DOCKER_USERNAME=$(aws secretsmanager get-secret-value --secret-id ${DOCKER_HUB_CREDENTIALS} --query SecretString --output text | jq -r '.username')
+        DOCKER_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${DOCKER_HUB_CREDENTIALS} --query SecretString --output text | jq -r '.password')
+      # Docker Hub にログイン
+      - echo "Logging in to Docker Hub..."
+      - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+      - echo "Successfully logged in to Docker Hub."
   pre_build:
     commands:
       - echo "Starting pre_build phase..."
@@ -14,6 +28,7 @@ phases:
       - REPOSITORY_URI_NGINX=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/nginx-proxy
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7) # Gitから取得するハッシュ
       - IMAGE_TAG=${COMMIT_HASH:-latest}
+      - echo "Successfully logged in to ECR."
 
   build:
     commands:
@@ -28,6 +43,8 @@ phases:
       - docker build -t $REPOSITORY_URI_NGINX:latest -f Dockerfile.nginx .
       - docker tag $REPOSITORY_URI_NGINX:latest $REPOSITORY_URI_NGINX:$IMAGE_TAG
 
+      - echo "Docker image built successfully."
+
   post_build:
     commands:
       - echo Build completed on `date`
@@ -40,6 +57,8 @@ phases:
       # ECSタスク定義で参照するために、イメージURIを格納したファイルを生成
       # このファイルはCodePipelineの次のステージ（例: ECSデプロイ）で利用される
       - printf '[{"name":"django_photo_app","imageUri":"%s"},{"name":"nginx-proxy","imageUri":"%s"}]' $REPOSITORY_URI_DJANGO:$IMAGE_TAG $REPOSITORY_URI_NGINX:$IMAGE_TAG > imagedefinitions.json
+
+      - echo "Docker image pushed to ECR successfully."
 
 artifacts:
   files:
