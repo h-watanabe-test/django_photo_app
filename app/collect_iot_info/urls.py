@@ -1,6 +1,7 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
 from .views import S3PresignedURLView, UploadRecordListView, top, logout_view
+from .views import HealthCheckView
 from . import views  # 自作の画面表示用ビュー
 from django.contrib.auth.views import LoginView, LogoutView
 urlpatterns = [

@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from collect_iot_info.views import HealthCheckView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),    #   管理者ページ
+    path('health/', HealthCheckView.as_view(), name='health_check'), # ヘルスチェック
     path('', include('collect_iot_info.urls')),
 ]
