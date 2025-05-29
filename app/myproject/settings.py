@@ -84,14 +84,13 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql', #PostgreSQLを利用
-        'NAME': os.environ.get('AURORADB_NAME'),
-        'USER': os.environ.get('AURORADB_USER'),
-        'PASSWORD': os.environ.get('AURORADB_PASSWORD'),
-        'HOST': os.environ.get('AURORADB_HOST'),
-        'PORT': os.environ.get('AURORADB_PORT', '5432'),
+        'NAME': os.environ.get('POSTGREDB_NAME'),
+        'USER': os.environ.get('POSTGREDB_USER'),
+        'PASSWORD': os.environ.get('POSTGREDB_PASSWORD'),
+        'HOST': os.environ.get('POSTGREDB_HOST'),
+        'PORT': os.environ.get('POSTGREDB_PORT', '5432'),
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 

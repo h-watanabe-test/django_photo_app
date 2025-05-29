@@ -28,11 +28,22 @@ COPY app/ . /app/
 # RUN python manage.py collectstatic --noinput
 # RUN python manage.py migrate
 
+# entrypoint.sh をコピーし、実行権限を付与
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # コンテナがリッスンするポート
 # Djangoのデフォルトは8000 (runserver) またはGunicorn/uWSGIなどが使うポート
 # ここではGunicorn/uWSGIを使うことを想定
 EXPOSE 8000
 
+# コンテナ起動時に entrypoint.sh を実行するように設定
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# CMD は ENTRYPOINT の引数となるが、entrypoint.shで全て制御するのでここでは不要。
+# あるいは、CMDでデフォルト引数を渡すこともできるが、今回のケースではentrypoint.sh内で完結させる。
+CMD []
+
 # GunicornなどのWSGIサーバーを起動するコマンド
 # CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"] # 開発用
-CMD ["gunicorn", "myproject.wsgi:application", "--bind", "0.0.0.0:8000"]
+# CMD ["gunicorn", "myproject.wsgi:application", "--bind", "0.0.0.0:8000"]
+# entrypointに移行
