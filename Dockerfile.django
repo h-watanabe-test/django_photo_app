@@ -1,5 +1,5 @@
 # ベースイメージとしてPythonと軽量なAlpine Linuxを使用
-FROM python:3.12-alpine
+FROM python:3.11-alpine
 
 # システムパッケージのインストールとクリーンアップ
 # Djangoアプリが動作するために必要な依存関係（例: psycopg2-binaryがPostgreSQLとやり取りするため）

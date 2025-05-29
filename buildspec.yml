@@ -2,8 +2,6 @@ version: 0.2
 
 phases:
   install:
-    runtime-versions:
-      docker: 19
     commands:
       # Docker Hub 認証情報のための環境変数を設定
       # Secrets Manager から認証情報を取得
