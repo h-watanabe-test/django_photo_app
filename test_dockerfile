@@ -1,0 +1,4 @@
+FROM alpine:latest
+#COPY entrypoint.sh /tmp/entrypoint.sh
+WORKDIR /app
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
